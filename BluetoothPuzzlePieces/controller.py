@@ -67,7 +67,8 @@ def main():
         received = uart.read(timeout_sec=60)
         if received is not None:
             # Received data, print it out.
-            print('Received: {0}'.format(received))
+            if str(received == "touched"):
+                print('Touched')
         else:
             # Timeout waiting for data, None is returned.
             print('Received no data!')

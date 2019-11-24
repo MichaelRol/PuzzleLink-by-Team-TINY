@@ -96,12 +96,12 @@ void setup(void)
 {
   while (!Serial);  // required for Flora & Micro
   delay(500);
-  pinMode(12, OUTPUT); //LED INPUT
-  pinMode(11, INPUT); //BUTTON TOUCHED
   Serial.begin(115200);
   Serial.println(F("Adafruit Bluefruit Command Mode Example"));
   Serial.println(F("---------------------------------------"));
-
+  pinMode(12, OUTPUT); //LED INPUT
+  pinMode(11, INPUT); //BUTTON TOUCHED
+  digitalWrite(12, 1);
   /* Initialise the module */
   Serial.print(F("Initialising the Bluefruit LE module: "));
 
@@ -156,28 +156,28 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  if (digitalRead(11) == HIGH) {
-//      Serial.print("Touched");
-//    ble.print("AT+BLEUARTTX=");
-//    ble.println("WOW MAN");
+  if (digitalRead(11) == 1) {
+     Serial.print("Touched");
+    ble.print("AT+BLEUARTTX=");
+    ble.println("touched");
   }
   // Check for user input
   char inputs[BUFSIZE+1];
 
-  if ( getUserInput(inputs, BUFSIZE) )
-  {
-    // Send characters to Bluefruit
-    Serial.print("[Send] ");
-    Serial.println(inputs);
-
-    ble.print("AT+BLEUARTTX=");
-    ble.println(inputs);
-
-    // check response stastus
-    if (! ble.waitForOK() ) {
-      Serial.println(F("Failed to send?"));
-    }
-  }
+//  if ( getUserInput(inputs, BUFSIZE) )
+//  {
+//    // Send characters to Bluefruit
+//    Serial.print("[Send] ");
+//    Serial.println(inputs);
+//
+//    ble.print("AT+BLEUARTTX=");
+//    ble.println(inputs);
+//
+//    // check response stastus
+//    if (! ble.waitForOK() ) {
+//      Serial.println(F("Failed to send?"));
+//    }
+//  }
 
   // Check for incoming characters from Bluefruit
   ble.println("AT+BLEUARTRX");
