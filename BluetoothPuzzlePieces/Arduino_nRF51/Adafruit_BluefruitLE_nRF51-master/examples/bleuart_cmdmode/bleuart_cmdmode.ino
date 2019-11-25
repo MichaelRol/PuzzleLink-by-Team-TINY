@@ -94,11 +94,13 @@ void error(const __FlashStringHelper*err) {
 /**************************************************************************/
 void setup(void)
 {
-  while (!Serial);  // required for Flora & Micro
+//  while (!Serial);  // required for Flora & Micro
   delay(500);
+
   Serial.begin(115200);
   Serial.println(F("Adafruit Bluefruit Command Mode Example"));
   Serial.println(F("---------------------------------------"));
+  
   pinMode(12, OUTPUT); //LED INPUT
   pinMode(11, INPUT); //BUTTON TOUCHED
   digitalWrite(12, 0);
@@ -148,7 +150,7 @@ void setup(void)
     Serial.println(F("******************************"));
   }
 }
- 
+
 /**************************************************************************/
 /*!
     @brief  Constantly poll for new command or response data
@@ -156,27 +158,35 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  if (digitalRead(12) == 1) {
-    if (digitalRead(11) == 1) {
-      Serial.print("Touched");
-      digitalWrite(12, 0);
-      ble.print("AT+BLEUARTTX=");
-      ble.println("touched");
+  // Check for user input
+  char inputs[BUFSIZE+1];
+
+  if ( getUserInput(inputs, BUFSIZE) )
+  {
+    // Send characters to Bluefruit
+    Serial.print("[Send] ");
+    Serial.println(inputs);
+
+    ble.print("AT+BLEUARTTX=");
+    ble.println(inputs);
+
+    // check response stastus
+    if (! ble.waitForOK() ) {
+      Serial.println(F("Failed to send?"));
     }
-  } else {
-      
-    // Check for incoming characters from Bluefruit
-    ble.println("AT+BLEUARTRX");
-    ble.readline();
-    if (strcmp(ble.buffer, "OK") == 0) {
-      // no data
-      return;
-    }
-      // Some data was found, its in the buffer
-    digitalWrite(12, 1);
-    ble.waitForOK();
   }
 
+  // Check for incoming characters from Bluefruit
+  ble.println("AT+BLEUARTRX");
+  ble.readline();
+  if (strcmp(ble.buffer, "OK") == 0) {
+    // no data
+    return;
+  }
+  // Some data was found, its in the buffer
+  Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
+  digitalWrite(12, 1);
+  ble.waitForOK();
 }
 
 /**************************************************************************/
