@@ -158,23 +158,26 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  // Check for user input
-  char inputs[BUFSIZE+1];
-
-  if ( getUserInput(inputs, BUFSIZE) )
-  {
+//  // Check for user input
+//  char inputs[BUFSIZE+1];
+//
+//  if ( getUserInput(inputs, BUFSIZE) )
+//  {
     // Send characters to Bluefruit
-    Serial.print("[Send] ");
-    Serial.println(inputs);
-
-    ble.print("AT+BLEUARTTX=");
-    ble.println(inputs);
-
-    // check response stastus
-    if (! ble.waitForOK() ) {
-      Serial.println(F("Failed to send?"));
+//    Serial.print("[Send] ");
+//    Serial.println(inputs);
+    if (digitalRead(12) == 1) {
+      if (digitalRead(11) == 1) {
+        digitalWrite(12, 0);
+        ble.print("AT+BLEUARTTX=");
+        ble.println("touched");
+        // check response stastus
+        if (! ble.waitForOK() ) {
+          Serial.println(F("Failed to send?"));
+        }
+      }
     }
-  }
+//  }
 
   // Check for incoming characters from Bluefruit
   ble.println("AT+BLEUARTRX");
