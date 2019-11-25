@@ -83,7 +83,7 @@ uint8_t connection_num = 0; // for blink pattern
 void setup() 
 {
   Serial.begin(115200);
-  while ( !Serial ) delay(10);   // for nrf52840 with native usb
+  //while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
   // Initialize blinkTimer for 100 ms and start it
   blinkTimer.begin(100, blink_timer_callback);
@@ -223,9 +223,13 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   uint16_t conn_handle = uart_svc.connHandle();
 
   int id = findConnHandle(conn_handle);
+  Serial.println(id);
   
   if (id == 0) {
     prph_info_t* peer = &prphs[1];
+    peer->bleuart.print("sgtr");
+  } else if (id == 1) {
+    prph_info_t* peer = &prphs[2];
     peer->bleuart.print("sgtr");
   } else {
     digitalWrite(16, 1);
