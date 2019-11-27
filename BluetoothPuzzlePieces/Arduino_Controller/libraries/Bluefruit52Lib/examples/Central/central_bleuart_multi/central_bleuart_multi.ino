@@ -223,17 +223,22 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   uint16_t conn_handle = uart_svc.connHandle();
 
   int id = findConnHandle(conn_handle);
-  Serial.println(id);
-  
-  if (id == 0) {
-    prph_info_t* peer = &prphs[1];
-    peer->bleuart.print("sgtr");
-  } else if (id == 1) {
-    prph_info_t* peer = &prphs[2];
-    peer->bleuart.print("sgtr");
+  prph_info_t* peer = &prphs[id + 1];
+  if (peer->bleuart.discovered()) {
+    peer->bleuart.print("ON");
   } else {
     digitalWrite(16, 1);
   }
+  
+//  if (id == 0) {
+//    prph_info_t* peer = &prphs[1];
+//    peer->bleuart.print("ON");
+//  } else if (id == 1) {
+//    prph_info_t* peer = &prphs[2];
+//    peer->bleuart.print("ON");
+//  } else if (id == 2) {
+//    digitalWrite(16, 1);
+//  }
 //  
 //  state++; 
 //  if (state == connection_num) {
@@ -271,18 +276,10 @@ void loop()
         digitalWrite(16, 0);
         state = 1;
         prph_info_t* peer = &prphs[0];
-        peer->bleuart.print("HB");
+        peer->bleuart.print("ON");
 
       }
     }
-//    // default MTU with an extra byte for string terminator
-//    char buf[20+1] = { 0 };
-//    
-//    // Read from HW Serial (normally USB Serial) and send to all peripherals
-//    if ( Serial.readBytes(buf, sizeof(buf)-1) )
-//    {
-//      sendAll(buf);
-//    }
   }
 }
 
