@@ -206,6 +206,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 
   // Mark conn handle as invalid
   prphs[id].conn_handle = BLE_CONN_HANDLE_INVALID;
+  prphs[id].discovered = false;
 
   Serial.print(prphs[id].name);
   Serial.println(" disconnected!");
@@ -231,14 +232,17 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
     }
   } else {
     int id_new = int(rand() % (connection_num + 1));
-    while (id_new == id) {
+    prph_info_t* peer = &prphs[id_new];
+    while ((id_new == id or !peer->bleuart.discovered()) and id_new != connection_num) {
       id_new = int(rand() % (connection_num + 1));
+      peer = &prphs[id_new];
     }
     if (id_new == connection_num) {
+      Serial.println("Base");
       digitalWrite(16, 1);
     } else {
-      prph_info_t* peer = &prphs[id_new];
       if (peer->bleuart.discovered()) {
+        Serial.println(id_new);
         peer->bleuart.print("ON");
       } else {
         digitalWrite(16, 1);
