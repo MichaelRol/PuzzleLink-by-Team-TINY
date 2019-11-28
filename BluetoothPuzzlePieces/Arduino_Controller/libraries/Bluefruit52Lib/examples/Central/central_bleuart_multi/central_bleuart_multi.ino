@@ -230,11 +230,11 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
       digitalWrite(16, 1);
     }
   } else {
-    int id_new = int(rand() % 4);
+    int id_new = int(rand() % (connection_num + 1));
     while (id_new == id) {
-      id_new = int(rand() % 4);
+      id_new = int(rand() % (connection_num + 1));
     }
-    if (id_new == 3) {
+    if (id_new == connection_num) {
       digitalWrite(16, 1);
     } else {
       prph_info_t* peer = &prphs[id_new];
@@ -278,7 +278,7 @@ void loop()
           prph_info_t* peer = &prphs[0];
           peer->bleuart.print("ON");
         } else {
-          int id = int(rand() % 3);
+          int id = int(rand() % connection_num);
           Serial.println(id);
           prph_info_t* peer = &prphs[id];
           peer->bleuart.print("ON");
