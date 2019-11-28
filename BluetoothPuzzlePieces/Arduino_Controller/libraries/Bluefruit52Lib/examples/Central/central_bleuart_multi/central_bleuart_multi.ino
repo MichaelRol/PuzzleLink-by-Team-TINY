@@ -75,11 +75,10 @@ typedef struct
  * handle as index directly with the expense of SRAM.
  */
 prph_info_t prphs[BLE_MAX_CONNECTION];
-int state = 0;
 // Software Timer for blinking the RED LED
 SoftwareTimer blinkTimer;
 uint8_t connection_num = 0; // for blink pattern
-
+uint8_t mode = 1; //0 = sequence, 1 = random
 void setup() 
 {
   Serial.begin(115200);
@@ -223,28 +222,29 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
   uint16_t conn_handle = uart_svc.connHandle();
 
   int id = findConnHandle(conn_handle);
-  prph_info_t* peer = &prphs[id + 1];
-  if (peer->bleuart.discovered()) {
-    peer->bleuart.print("ON");
+  if (mode == 0) {
+    prph_info_t* peer = &prphs[id + 1];
+    if (peer->bleuart.discovered()) {
+      peer->bleuart.print("ON");
+    } else {
+      digitalWrite(16, 1);
+    }
   } else {
-    digitalWrite(16, 1);
+    int id_new = int(rand() % 4);
+    while (id_new == id) {
+      id_new = int(rand() % 4);
+    }
+    if (id_new == 3) {
+      digitalWrite(16, 1);
+    } else {
+      prph_info_t* peer = &prphs[id_new];
+      if (peer->bleuart.discovered()) {
+        peer->bleuart.print("ON");
+      } else {
+        digitalWrite(16, 1);
+      }
+    }
   }
-  
-//  if (id == 0) {
-//    prph_info_t* peer = &prphs[1];
-//    peer->bleuart.print("ON");
-//  } else if (id == 1) {
-//    prph_info_t* peer = &prphs[2];
-//    peer->bleuart.print("ON");
-//  } else if (id == 2) {
-//    digitalWrite(16, 1);
-//  }
-//  
-//  state++; 
-//  if (state == connection_num) {
-//    state = 0;
-//  }
-  
 }
 
 /**
@@ -274,10 +274,15 @@ void loop()
     if (digitalRead(16) == 1) {
       if (digitalRead(15) == 1) {
         digitalWrite(16, 0);
-        state = 1;
-        prph_info_t* peer = &prphs[0];
-        peer->bleuart.print("ON");
-
+        if (mode == 0) {
+          prph_info_t* peer = &prphs[0];
+          peer->bleuart.print("ON");
+        } else {
+          int id = int(rand() % 3);
+          Serial.println(id);
+          prph_info_t* peer = &prphs[id];
+          peer->bleuart.print("ON");
+        }
       }
     }
   }
