@@ -79,6 +79,7 @@ prph_info_t prphs[BLE_MAX_CONNECTION];
 SoftwareTimer blinkTimer;
 uint8_t connection_num = 0; // for blink pattern
 uint8_t mode = 1; //0 = sequence, 1 = random
+uint8_t count = 0; // Counts how many touches has happened
 void setup() 
 {
   Serial.begin(115200);
@@ -206,8 +207,6 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 
   // Mark conn handle as invalid
   prphs[id].conn_handle = BLE_CONN_HANDLE_INVALID;
-  prphs[id].discovered = false;
-
   Serial.print(prphs[id].name);
   Serial.println(" disconnected!");
 }
@@ -249,8 +248,30 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
       }
     }
   }
+
+  count++;
+  if (count >= 25) {
+    endGame();
+  }
 }
 
+void endGame() {
+  
+  count = 0;
+  for (int x = 0; x < connection_num; x++) {
+    prph_info_t* peer = &prphs[x];
+    if (peer->bleuart.discovered()){
+      peer->bleuart.print("END");
+    }
+  }
+  for (int y = 0; y < 5; y++) {
+      digitalWrite(16, 1);
+      delay(500);
+      digitalWrite(16, 0);
+      delay(500);      
+  }
+  digitalWrite(16, 1);
+}
 /**
  * Helper function to send a string to all connected peripherals
  */
@@ -278,6 +299,10 @@ void loop()
     if (digitalRead(16) == 1) {
       if (digitalRead(15) == 1) {
         digitalWrite(16, 0);
+        count++;
+        if (count >= 25) {
+          endGame();
+        }
         if (mode == 0) {
           prph_info_t* peer = &prphs[0];
           peer->bleuart.print("ON");

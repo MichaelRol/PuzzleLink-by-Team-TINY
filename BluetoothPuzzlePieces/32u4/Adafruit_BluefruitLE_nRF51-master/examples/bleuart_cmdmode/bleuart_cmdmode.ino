@@ -177,8 +177,14 @@ void loop(void)
     // no data
     return;
   }
-  // Some data was found, its in the buffer
-  Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
   digitalWrite(12, 1);
+  if (strcmp(ble.buffer, "END") == 0) {
+    for (int x = 0; x < 5; x++) {
+      digitalWrite(12, 1);
+      delay(500);
+      digitalWrite(12, 0);
+      delay(500);    
+    }
+  }
   ble.waitForOK();
 }
