@@ -11,8 +11,8 @@ When connected together the puzzle pieces are designed to help calm the child wh
 
 ## Members
 
-Michael Rollins
-Joe Matthews
-Miklós Borsi
-Callum Fawcett
-Shona Allman
+- Michael Rollins
+- Joe Matthews
+- Miklós Borsi
+- Callum Fawcett
+- Shona Allman
